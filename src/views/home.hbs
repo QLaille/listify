@@ -1,0 +1,26 @@
+<link rel="stylesheet" type="text/css" href="/css/home.css"/>
+
+playlists
+<ul>
+	{{#each playlists}}
+		<li>
+			{{this}}
+			{{!-- <ul>
+				{{#each songs}}
+					<li>{{song_name}}</li>
+				{{/each}}
+			</ul> --}}
+		</li>
+	{{/each}}
+</ul>
+
+<div name="oui">
+	<form action="home/new" method="POST">
+		New playlist name:
+		<input type="text" name="name">
+		<input type="submit">
+	</form>
+</div>
+{{!--
+<a href="http://localhost:1234/home/new">new playlist</a>
+<a href="http://localhost:1234/home/profile">profile</a> --}}

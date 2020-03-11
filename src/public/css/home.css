@@ -1,0 +1,9 @@
+.oui:hover > form {
+	display:block;
+}
+
+.non {
+	display:none;
+}
+
+a { display:none}
