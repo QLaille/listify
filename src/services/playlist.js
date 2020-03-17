@@ -1,166 +1,114 @@
 const Playlist = require('../database/models/playlist');
+var ObjectId = require('mongoose').Types.ObjectId;
 
-/*
-** create playlist for a user
-*/
-async function createPlaylist(userName, playlistName) {
+function createPlaylist(userName = null, playlistName = null) { //TODO checking on username and playlist name (empty, duplicate, etc.)
 	try {
-		return Playlist.find({"creator": userName, "name": playlistName}, async (err, playlist) => {
-			if (err) {
-				return (err);
-			} else if (!playlist) {
-				const newPlaylist = new Playlist({name:playlistName, creator: userName})
-				await newPlaylist.save();
-				return (true);
-			} else {
-				return (false);
-			}
-		});
+		if (playlistName === null || userName === null)
+			return (false);//Incomplete
+
+		let playlist = new Playlist({name: playlistName, creator: userName});
+
+		return (playlist
+			.save()
+			.then((playlist) => {return playlist._id})//Ok
+			.catch((err) => {console.log(err);return null})//Err
+		);
 	} catch (error) {
-		// err
+		console.log("Error occured when creating a playlist:");
+		console.log(error);
+		return (null);//Err
 	}
 }
 
-/*
-** get all playlists from a user
-**
-*/
-async function getUserAllPlaylist(user) {// TODO
+function playlistSearch(id = null, creator = null, name = null) {
+	if (id === null && (creator === null || name === null))
+		return (false); //Incomplete
 
-	if (!user.username)
-		return ([]);
-	return Playlist.find({"creator": user.username}, function (err,playlists) {
-		if (err || !playlists)
-			return ([]);
-		else
-			return (playlists);
+	if (id === null) {
+		return Playlist.find({"creator": creator, "name": name}, (err, playlists) => {
+			if (err) {
+				console.log(err);
+				return null;// Err
+			} else {
+				return (playlists); //Ok
+			}
+		});
+	} else {
+		return Playlist.find({"_id": new ObjectId(id)}, (err, playlists) => {
+			if (err) {
+				console.log(err);
+				return null;// Err
+			} else {
+				return (playlists); // Ok
+			}
+		});
+	}
+}
+
+function removePlaylist(playlistId = null) {
+	if (playlistId === null)
+		return false; //Incomplete
+
+	return Playlist
+		.deleteOne({"_id": new ObjectId(playlistId)})
+		.then(() => {return(true);})//Ok
+		.catch((err) => {console.log(err)})//Err
+	;
+}
+
+// TODO Check for invalid playlist names
+function updatePlaylistName(id = null, newName = null) {
+	if (id === null || newName === null)
+		return false;//Incomplete
+
+	return Playlist.findOneAndUpdate({"_id": new ObjectId(id)}, {$set:{name: newName}})
+		.then(() => {return true;})
+		.catch((err) => {console.log(err); return null;})
+	;
+}
+
+function getSongsFromPlaylist(playlistId = null) {
+	if (playlistId === null)
+		return (false);// Incomplete
+
+	return Playlist.findById(playlistId, (err, playlist) => {
+		if (err) {
+			console.log(err);
+			return null;//Err
+		} else if (!playlist) {
+			return (false);//Incomplete
+		} else {
+			return(playlist.songs);//Ok
+		}
 	})
 }
 
-/*
-** get all playlists from a user and return the names
-*/
-async function getUserAllPlaylistName(user) {
-	console.log(user)
-	return Playlist.distinct("name", {'creator': user.username}, function (err, names) {
-		console.log("oui")
-		console.log(err)
-		console.log("oui")
-		if (err || !names) {
-			// err
-		} else {
-			return (names);
-		}
-	});
+function addSongToPlaylist(playlistId = null, newSong = null) {
+	if (playlistId === null || newSong === null)
+		return (false); //Incomplete
+
+	return Playlist.findByIdAndUpdate(playlistId, {$push: {songs:newSong}})
+		.then(() => {return true;})
+		.catch((err) => {console.log(err); return null;})
+	;
 }
 
-/*
-** find a playlist from a user by name
-*/
-async function getUserPlaylistByName(user, playlistName) {
-	return Playlist.find({"creator": user, "name": playlistName})
-	.lean()
-	.then((playlist) => {
-		if (!playlist)
-			return ({});
-		else
-			return (playlist[0]);
-	});
-}
+function removeSongFromPlaylist(playlistId = null, name = null) {
+	if (playlistId === null || name === null)
+		return (false); //Incomplete
 
-/*
-** get songs of a playlist
-*/
-async function getPlaylistSongs(playlistName) {
-	return Playlist.find({"name": playlistName}, function (err, playlist) {
-		if (err || !playlist) {
-			// err
-		} else {
-			return (playlist.songs);
-		}
-	});
-}
-
-/*
-** remove a playlist by id
-*/
-function removePlaylist(id) {
-	Playlist.deleteOne({"id": id}, function (err) {
-		if (err) {
-			return (err);
-		} else {
-			return (true);
-		}
-	});
-}
-
-/*
-** remove a song from a playlist by its name
-*/
-function removeSongFromPlaylist(playlistName, entry) {
-	Playlist.find({"name": playlistName}, function (err, playlist) {
-		if (err || !playlist) {
-			return (false);
-		} else {
-			playlist.songs.filter((song) => {
-				if (song instanceof String) {
-					return (song !== entry);
-				} else {
-					return (false) //TODO lastFM object
-				}
-			});
-			playlist.save((err) => {
-				if (err) {
-					return (err);
-				} else {
-					return (true);
-				}
-			})
-		}
-	});
-}
-
-/*
-** add song to a playlist
-*/
-async function addSongToPlaylist(playlistName, entry) {
-	console.log(playlistName);
-	return Playlist.find({"name": playlistName}, function (err, playlist) { //TODO change for playlist recognition by ID
-		if (err || !playlist) {
-			// err
-		} else {
-			if (!entry in playlist[0].songs) {
-				playlist[0].songs.push(entry); //TODO: change that with lastFm when available
-				playlist[0].save((err) => {
-					if (err) {
-						return (err);
-					} else {
-						return (true);
-					}
-				})
-			} else {
-				return (false);
-			}
-		}
-	});
-}
-
-async function searchPlaylist(search=null) { // TODO
-	if (search === null) {
-// err or ignore ?
-	} else {
-		Playlist.find({}); // by name, creator
-	}
+		return Playlist.findByIdAndUpdate(playlistId, {$pull: {songs:name}})
+		.then(() => {return true;})
+		.catch((err) => {console.log(err); return null;})
+	;
 }
 
 module.exports = {
 	createPlaylist: createPlaylist,
-	getUserAllPlaylist: getUserAllPlaylist,
-	getUserAllPlaylistName: getUserAllPlaylistName,
-	getUserPlaylistByName: getUserPlaylistByName,
-	getPlaylistSongs: getPlaylistSongs,
+	playlistSearch: playlistSearch,
 	removePlaylist: removePlaylist,
-	removeSongFromPlaylist: removeSongFromPlaylist,
+	updatePlaylistName: updatePlaylistName,
+	getSongsFromPlaylist: getSongsFromPlaylist,
 	addSongToPlaylist: addSongToPlaylist,
-	searchPlaylist:searchPlaylist
+	removeSongFromPlaylist: removeSongFromPlaylist
 };

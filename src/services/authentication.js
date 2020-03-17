@@ -3,7 +3,8 @@ const
 	bcrypt = require('bcrypt'),
 	jwt = require('jsonwebtoken'),
 	User = require('../database/models/user'),
-	secret = require('../../secret')
+	secret = require('../../secret'),
+	userService = require('./user.js')
 ;
 
 function login(req, res, next) { // TODO error handling
@@ -34,17 +35,21 @@ function login(req, res, next) { // TODO error handling
 async function register(req,res,next) {
 	try {
 		const {username, password, email} = req.body;
-		if (typeof username != 'undefined' || typeof password != 'undefined' || typeof email != 'undefined') {
+		const ret = userService.createUser(username, password, email);
+		if (ret === username) {
+			res.status(200).send({ username }); //TODO redirect to home page
+		} else {
 			res.status(400).send({body:'Missing registration entry'});
-			return;
+			res.status(400).send({});//TODO
 		}
-		// TODO minimal password size
-		// TODO email not registered already
-		const psswdHash = await bcrypt.hash(password, 10)
-		const newUser = new User({username:username, password:psswdHash, userid: Date.now(), email:email})
-
-		await newUser.save();
-		res.status(200).send({ username });
+		// if (typeof username != 'undefined' || typeof password != 'undefined' || typeof email != 'undefined') {
+		// 	res.status(400).send({body:'Missing registration entry'});
+		// 	return;
+		// }
+		// // TODO minimal password size
+		// // TODO email not registered already
+		// const psswdHash = await bcrypt.hash(password, 10)
+		// const newUser = new User({username:username, password:psswdHash, userid: Date.now(), email:email})
 	} catch (error) {
 		console.log(error);
 		res.status(400).send({});

@@ -5,7 +5,7 @@ function index (req, res) {
 }
 
 function about (req, res) {
-	res.status(200).send('about'); // merge this to index
+	res.status(200).send('about');
 }
 
 function contact (req, res) {
