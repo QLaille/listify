@@ -8,20 +8,16 @@ module.exports = Router({mergeParams: true})
 // TODO add restriction to playlist name (US-ASCII)
 // create new playlist
 .post('/v1/playlist', async (req,res,next) => {
-	try {
-		const username = req.body.username;
-		const playlistName = req.body.playlistName;
-		let ret = await  playlist.createPlaylist(username, playlistName);
+	const username = req.body.username;
+	const playlistName = req.body.playlistName;
+	let ret = await  playlist.createPlaylist(username, playlistName);
 
-		if (ret === null)
-			res.sendStatus(500);
-		else if (ret === false)
-			res.sendStatus(400);
-		else
-			res.status(200).send(ret);
-	} catch {
-// err
-	}
+	if (ret === null)
+		res.sendStatus(500);
+	else if (ret === false)
+		res.sendStatus(400);
+	else
+		res.send(ret);
 })
 
 // TODO consider search playlist by name
@@ -43,18 +39,14 @@ module.exports = Router({mergeParams: true})
 
 // delete one playlist
 .delete('/v1/playlist', async (req,res,next) => { //TODO Add security to the delete
-	try {
-		const id = req.body.id;
-		let ret = await playlist.removePlaylist(id);
+	const id = req.body.id;
+	let ret = await playlist.removePlaylist(id);
 
-		if (ret === true)
-			res.sendStatus(200);
-		else if (ret === null)
-			res.sendStatus(400);
-		else
-			res.sendStatus(500);
-	} catch {
-// err
-	}
+	if (ret === true)
+		res.sendStatus(200);
+	else if (ret === null)
+		res.sendStatus(400);
+	else
+		res.sendStatus(500);
 })
 ;

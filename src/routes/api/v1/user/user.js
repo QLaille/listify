@@ -1,23 +1,73 @@
 const
 	Router = require('express').Router
+	user = require('../../../../services/user');
 ;
 
 module.exports = Router({mergeParams: true})
-.get('/v1/users/:id', async (req,res,next) => {
-	try {
-		const user = await req.db.Users.findById(req.params.id);
+// create new user
+.post('/v1/user', async (req,res,next) => {
+	const {name, password, email} = req.body;
 
-	} catch (error) {}
+	let ret = await user.createUser(name, password, email);
+
+	if (ret === null)
+		res.sendStatus(500);
+	else if (ret === false)
+		res.sendStatus(400);
+	else
+		res.send(ret);
 })
-// .post('/v1/users/:id', )
-.put('/v1/users/:id', async (req,res,next) => {
-	try {
-		// const user = await req.db.Users.findById(req.params.id);
-		// user.email = req.body.email;
-		// await user.save();
-		// res.sendStatus(204);
-	} catch (error) {
-		next(error);
-	}
+// search ONE(1) user by id
+.get('/v1/user', async (req,res,next) => {
+	const id = req.body.id;
+	const name = req.body.name;
+
+	let ret = await user.searchUser(id, name);
+	console.log(ret);
+	if (ret === null)
+		res.sendStatus(500);
+	else if (ret === false)
+		res.sendStatus(400);
+	else
+		res.send(ret);
 })
-// .delete('/v1/users/:id', )
+// delete one user
+.delete('/v1/user', async (req,res,next) => {
+	const id = req.body.id;
+
+	let ret = await  user.deleteUser(id);
+
+	if (ret === null)
+		res.sendStatus(500);
+	else if (ret === false)
+		res.sendStatus(400);
+	else
+		res.sendStatus(200);
+})
+// change user name
+.put('/v1/user/name', async (req,res,next) => {
+
+	const id = req.body.id;
+	const newName = req.body.name;
+
+	let ret = await user.updateUserName(id, newName);
+	if (ret === null)
+		res.sendStatus(500);
+	else if (ret === false)
+		res.sendStatus(400);
+	else
+		res.sendStatus(200);
+})
+// change user email
+.put('/v1/user/mail', async (req,res,next) => {
+	const id = req.body.id;
+	const newMail = req.body.mail;
+
+	let ret = await  user.updateUserMail(id, newMail);
+	if (ret === null)
+		res.sendStatus(500);
+	else if (ret === false)
+		res.sendStatus(400);
+	else
+		res.sendStatus(200);
+})

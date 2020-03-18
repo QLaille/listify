@@ -1,122 +1,91 @@
 const User = require('../database/models/user');
 const bcrypt = require('bcrypt');
 
-/* user */
 
-// express-handlebars hasn't fix the issue of data rendering with an array of size 1,
-// band-aid solution here:https://stackoverflow.com/questions/59753149/express-handlebars-wont-render-data
-async function getUser(user) {
-	 return User.find({"username": user.username})
-	.lean()
-	.then((user) => {
-		if (!user)
-			return {};
-		else
-			return user[0];
-	});
-}
+async function createUser(userName = null, password = null, email = null) {
+	if (userName === null || password === null || email === null)
+		return (false);//Incomplete
 
-async function createUser(userName, password, email) { // No ?
-	if (typeof username != 'undefined' || typeof password != 'undefined' || typeof email != 'undefined') {
-		return null;
+	try {
+	// TODO minimal password size && email not registered already
+		const psswdHash = await bcrypt.hash(password, 10);
+		const newUser = new User({username:userName, password:psswdHash, userid: Date.now(), email:email});
+
+		return newUser
+			.save()
+			.then((user) => {return (user._id);}) //Ok
+			.catch((err) => {console.log(err); return (null);}) //Err
+		;
+	} catch (error) {
+		console.log("Error occured when creating a user:");
+		console.log(error);
+		return (null);//Err
 	}
-	// TODO minimal password size
-	// TODO email not registered already
-	const psswdHash = await bcrypt.hash(password, 10)
-	const newUser = new User({username:username, password:psswdHash, userid: Date.now(), email:email})
-
-	await newUser.save();
-	return username;
 }
 
-async function deleteUser(username) { //TODO
-	// TODO restrict to admin / local
-	User.find({"username": username}, function(err, user) { // multiple usernames ? displayed names ?
-// TODO find by id and delete
-	});
-}
+function searchUser(id = null, name = null) {
+	if (id === null && name === null)
+		return (false);//Incomplete
 
-/* names */
-
-async function getUserName(userId) { // TODO
-	User.find({'userid': userId}, function(err, user) {
-		if (err) {
-			return err;
-		} else if (!user) {
-			return null;
-		} else {
-			return user.username;
-		}
-	});
-}
-
-/*
-** true / false / error
-*/
-async function changeUserName(user, newName) {
-	return User.find({"username": user}, function(err, user) {
-		if (err) {
-			return err;
-		} else if (!user) {
-			return false;
-		} else {
-			user.username = newName;
-			user.save((err) => {
-				if (err) {
-					return err;
+	if (id === null) {
+// TODO search users by search name term
+	} else {
+		return User
+			.findById(id)
+			.then((user) => {
+				if (user !== null) {
+					const safe = user.toObject();
+					delete safe.password;
+					delete safe.email;
+					console.log(safe);
+					return (safe); // Ok
 				} else {
-					return (true);
+					return (false);//Nothing
 				}
+
 			})
-		}
-	});
+			.catch((err) => {console.log(err); return null;})
+		;
+	}
 }
 
-/* mail */
+function deleteUser(id = null) { //TODO restrict to admin / local
+	if (id === null)
+		return (false);//Incomplete
 
-/*
-** true / false / error
-*/
-async function getUserMail(userName) {
-	return User.find({"username":userName}, function (err, user) {
-		if (err) {
-			return err;
-		} else if (!user) {
-			return null;
-		} else {
-			return user.email;
-		}
-	});
+	return User
+		.findByIdAndDelete(id)
+		.then(() => {return true;}) // Ok
+		.catch((err) => {console.log(err); return null;}) // Err
+	;
 }
 
-/*
-** true / false / error
-*/
-async function changeUserMail(userName, newMail) {
-	return User.find({"username": userName}, function(err, user) {
-		if (err || !user) {
-			// err
-		} else {
-			user.email = newMail;
-			user.save((err) => {
-				if (err) {
-					// err
-				} else {
-					return (true);
-				}
-			})
-		}
-	});
+function updateUserName(id = null, newName = null) {
+	if (id === null || newName === null)
+		return (false);//Incomplete
+
+	return User
+		.findByIdAndUpdate(id, {$set: {username: newName}})
+		.then(() => {return true;})
+		.catch((err) => {console.log(err); return null;})
+	;
 }
 
-/* password */
+function updateUserMail(id = null, newMail = null) {
+	if (id === null || newMail === null)
+		return (false);//Incomplete
 
-async function changeUserPassword() { //TODO passport ? What ?
-
+	return User
+		.findByIdAndUpdate(id, {$set: {email: newMail}})
+		.then(() => {return true;})
+		.catch((err) => {console.log(err); return null;})
+	;
 }
 
 module.exports = {
-	getUser: getUser,
-	changeUserName: changeUserName,
-	changeUserMail: changeUserMail
+	createUser: createUser,
+	searchUser: searchUser,
+	deleteUser: deleteUser,
+	updateUserName: updateUserName,
+	updateUserMail: updateUserMail
 };
