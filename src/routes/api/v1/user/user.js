@@ -23,7 +23,7 @@ module.exports = Router({mergeParams: true})
 	const name = req.body.name;
 
 	let ret = await user.searchUser(id, name);
-	console.log(ret);
+	// console.log(ret);
 	if (ret === null)
 		res.sendStatus(500);
 	else if (ret === false)

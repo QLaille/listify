@@ -5,8 +5,9 @@ const
 
 module.exports = Router({mergeParams: true})
 .get('/home', homeController.index)
-.get('/home/profile/:name', homeController.profile)
-.get('/home/:user/playlist', homeController.showAllPlaylist)
-.get('/home/:user/playlist/:name', homeController.showPlaylist)
-.post('/home/new', homeController.newPlaylist)
-.post('/home/:user/playlist/:name', homeController.addSongToPlaylist)
+.get('/@/:name', homeController.profile)
+.get('/playlist/:id', homeController.showPlaylist)
+.get('/search', homeController.search)
+.post('/playlist/new', homeController.postNewPlaylist)
+.post('/playlist/:id', homeController.addSongToPlaylist)
+;

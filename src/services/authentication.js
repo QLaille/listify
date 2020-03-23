@@ -7,7 +7,7 @@ const
 	userService = require('./user.js')
 ;
 
-function login(req, res, next) { // TODO error handling
+function login(req, res, next) { // TODO error handling && duplicate users
 	try {
 		passport.authenticate('local', {session:false}, (error, user) => {
 			if (error || !user) {
@@ -56,7 +56,18 @@ async function register(req,res,next) {
 	}
 }
 
+async function logout(req, res, next) {
+	console.log(req.cookies);
+	if (req.cookies.jwt) {
+		res.clearCookie('jwt');
+		res.redirect('/');
+	} else {
+		res.redirect('/login');
+	}
+}
+
 module.exports = {
 	login: login,
-	register: register
+	register: register,
+	logout: logout
 }

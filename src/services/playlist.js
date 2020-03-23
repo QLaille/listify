@@ -21,19 +21,25 @@ function createPlaylist(userName = null, playlistName = null) { //TODO checking 
 }
 
 function playlistSearch(id = null, creator = null, name = null) {
-	if (id === null && (creator === null || name === null))
+	if (id === null && creator === null && name === null)
 		return (false); //Incomplete
 
-	if (id === null) {
-		return Playlist
-			.find({"creator": creator, "name": name})
-			.then((playlists) => {return playlists;})
-			.catch((err) => {console.log(err); return (null);})
-		;
-	} else {
+	if (id !== null) {
 		return Playlist
 			.findById(id)
 			.then((playlist) => {return (playlist);})
+			.catch((err) => {console.log(err); return (null);})
+		;
+	} else if (creator !== null) {
+		return Playlist
+			.find({"creator": creator})
+			.then((playlists) => {return playlists;})
+			.catch((err) => {console.log(err); return (null);})
+		;
+	} else if (name !== null) {
+		return Playlist
+			.find({"name": {$regex: name, $options: 'i'}})
+			.then((playlists) => {return playlists;})
 			.catch((err) => {console.log(err); return (null);})
 		;
 	}

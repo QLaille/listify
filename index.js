@@ -28,7 +28,8 @@ app.engine('hbs', hbs({
 	partialsDir: __dirname + '/src/views/partials/',
 	allowProtoPropertiesByDefault:true,
 	allowProtoMethodsByDefault:true,
-	allowInsecurePrototypeAccess:true
+	allowInsecurePrototypeAccess:true,
+
 }));
 
 app.set('views', path.join(__dirname, 'src/views'));

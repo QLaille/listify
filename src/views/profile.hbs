@@ -1,1 +1,7 @@
 <h1>{{profile.username}}</h1>
+{{#each playlists}}
+	<h3>{{this.name}}</h3>
+	{{#each this.songs}}
+		<h4>{{this}}</h4>
+	{{/each}}
+{{/each}}

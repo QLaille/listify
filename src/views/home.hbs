@@ -4,23 +4,23 @@ playlists
 <ul>
 	{{#each playlists}}
 		<li>
-			{{this}}
-			{{!-- <ul>
-				{{#each songs}}
-					<li>{{song_name}}</li>
-				{{/each}}
-			</ul> --}}
+			<a href="http://localhost:1234/playlist/{{this.id}}">{{this.name}}</a>
 		</li>
 	{{/each}}
 </ul>
 
-<div name="oui">
-	<form action="home/new" method="POST">
+<div name="new-playlist">
+	<form action="playlist/new" method="POST">
 		New playlist name:
 		<input type="text" name="name">
 		<input type="submit">
 	</form>
 </div>
-{{!--
-<a href="http://localhost:1234/home/new">new playlist</a>
-<a href="http://localhost:1234/home/profile">profile</a> --}}
+
+<div name="search-playlist">
+	<form action="search" method="GET">
+		Search for a playlist (or a creator):
+		<input type="text" name="search">
+		<input type="submit">
+	</form>
+</div>

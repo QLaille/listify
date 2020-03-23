@@ -15,6 +15,7 @@ function contact (req, res) {
 function login (req, res) {
 	res.render('login', {
 		layout:'default',
+		SelfPage: true
 	});
 }
 

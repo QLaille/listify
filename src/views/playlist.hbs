@@ -4,7 +4,13 @@
 		{{this}}
 	{{/each}}
 </div>
-<form action="" method="POST">
-	<input name="name" type="text">
-	<input type="submit">
-</form>
+
+{{#if canAddSong}}
+<div name="add_song">
+	Add new song
+	<form action="{{playlist.id}}" method="POST">
+		<input name="name" type="text">
+		<input type="submit">
+	</form>
+</div>
+{{/if}}

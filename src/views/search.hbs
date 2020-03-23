@@ -1,0 +1,18 @@
+<div name="user_search">
+	<h3>Users:</h3>
+	<ul>
+		{{#each users}}
+		<li>{{this.username}}</li>
+		{{/each}}
+	</ul>
+</div>
+<div name="playlist_search">
+	<h3>Playlists:</h3>
+	<ul>
+		{{#each playlists}}
+		<li>
+			<a href="http://localhost:1234/playlist/{{this.id}}">{{this.name}}</a>
+		</li>
+		{{/each}}
+	</ul>
+</div>

@@ -29,6 +29,20 @@ function searchUser(id = null, name = null) {
 
 	if (id === null) {
 // TODO search users by search name term
+
+		return User
+			.find({"username": {$regex: name, $options: 'i'}})
+			.then((users) => {
+				// console.log(users)
+				const safe = users.map(user => {
+					const u = user.toObject();
+					delete u.password;
+					delete u.email;
+					return u;
+				});
+			})
+			.catch((err) => {console.log(err); return null;})
+		;
 	} else {
 		return User
 			.findById(id)
