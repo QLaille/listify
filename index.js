@@ -14,7 +14,12 @@ const app = express();
 require('./src/config/passport');
 require('./src/database');
 
-app.use(express.static(path.join(__dirname, '/public')));
+app.use(express.static(__dirname + '/src/public', {
+	index: false,
+    immutable: true,
+    cacheControl: true,
+    maxAge: "30d"
+}));
 app.use(cookieParser());
 app.use(cors({ origin:true, credentials:true }));
 app.use(bodyParser.urlencoded({extended : true}));

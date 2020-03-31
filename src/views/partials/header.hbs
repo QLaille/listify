@@ -1,12 +1,22 @@
-<header>
-{{#unless SelfPage}}
-{{#if isLoggedIn}}
-<a href="http://localhost:1234/home">Home</a>
-<a href="http://localhost:1234/logout">Log out</a>
-{{else}}
-<a href="http://localhost:1234/login">Log In or Register</a>
-{{/if}}
-{{/unless}}
-
-
+<header class="header">
+	<div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+		<a class="pure-menu-heading">Listify</a>
+		<ul class="pure-menu-list">
+			{{#unless SelfPage}}
+				{{#if isLoggedIn}}
+					<li class="pure-menu-item">
+						<a href="http://localhost:1234/home">Home</a>
+					</li>
+					<li class="pure-menu-item">
+						<a href="http://localhost:1234/logout">Log out</a>
+					</li>
+				{{else}}
+					<li class="pure-menu-item">
+						<a href="http://localhost:1234/login">Log In or Sign Up</a>
+					</li>
+				{{/if}}
+			{{/unless}}
+			<li> </li>
+		</ul>
+	</div>
 </header>

@@ -1,18 +1,30 @@
-<div name="user_search">
-	<h3>Users:</h3>
-	<ul>
-		{{#each users}}
-		<li>{{this.username}}</li>
-		{{/each}}
-	</ul>
+<div class="home-wrapper">
+	<div class="pure-g">
+
+		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-2">
+			<div name="user_search">
+				<h3>Users:</h3>
+				<ul>
+					{{#each users}}
+						<li>{{this.username}}</li>
+					{{/each}}
+				</ul>
+			</div>
+		</div>
+
+		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-2">
+			<div name="playlist_search">
+				<h3>Playlists:</h3>
+				<ul>
+					{{#each playlists}}
+						<li>
+							<a href="http://localhost:1234/playlist/{{this.id}}">{{this.name}}</a>
+						</li>
+					{{/each}}
+				</ul>
+			</div>
+		</div>
+
+	</div>
 </div>
-<div name="playlist_search">
-	<h3>Playlists:</h3>
-	<ul>
-		{{#each playlists}}
-		<li>
-			<a href="http://localhost:1234/playlist/{{this.id}}">{{this.name}}</a>
-		</li>
-		{{/each}}
-	</ul>
-</div>
+

@@ -1,27 +1,27 @@
-function index (req, res) {
+const passport = require('passport');
+
+function index (req, res, next) {
 	res.render('index', {
 		layout:'default',
 	});
 }
 
-function about (req, res) {
-	res.status(200).send('about');
-}
+function login (req, res, next) {
+	passport.authenticate('jwt', {session:false}, async (err, user, info) => {
+		if (user !== false) {
+			res.redirect('/home')
+			return;
+		}
+		res.render('login', {
+			layout:'default',
+			SelfPage: true
+		});
 
-function contact (req, res) {
-	res.status(200).send('contact');
-}
+	})(req,res,next);
 
-function login (req, res) {
-	res.render('login', {
-		layout:'default',
-		SelfPage: true
-	});
 }
 
 module.exports = {
     index: index,
-    about: about,
-	contact: contact,
 	login: login
 };

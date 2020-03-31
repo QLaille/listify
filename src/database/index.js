@@ -1,13 +1,6 @@
 const mongoose = require('mongoose');
 
-const USERN = '';
-const PSSWD = '';
-const HOSTN = '';
-
-const DBNAME = '';
-const PORT = '';
-
-mongoose.connect('mongodb+srv://laqu19dt:0lwKd9uIKWUPqbPm@cluster0-0iynr.mongodb.net/Listify?retryWrites=true&w=majority');
+mongoose.connect('mongodb+srv://laqu19dt:0lwKd9uIKWUPqbPm@cluster0-0iynr.mongodb.net/Listify?retryWrites=true&w=majority');//TODO Remove this file from git tracker
 var connection = mongoose.connection;
 
 module.exports = connection;

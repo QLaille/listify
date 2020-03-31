@@ -1,19 +1,29 @@
-login
-<form action="login" method="POST">
-	Username<br>
-	<input name="username" type="text"><br>
+<div class="home-wrapper">
+	<div class="pure-g">
+		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-2">
+		<h3>Login</h3>
+			<form action="login" method="POST">
+				Username<br>
+	<input name="username" type="text"required><br>
 	Password<br>
-	<input name="password" type="password"><br>
+	<input name="password" type="password" required><br>
 	<input type="submit">
 </form>
 
-register
+		</div>
+		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-2">
+			<h3>Register</h3>
 <form action="register" method="POST">
 	email<br>
-	<input name="email" type="email"><br>
+	<input name="email" type="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}"><br>
 	Username<br>
-	<input name="usern" type="text"><br>
+	<input name="usern" type="text" required><br>
 	Password<br>
-	<input name="psswd" type="password"><br>
+	<input name="psswd" type="password" required pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"><br>
 	<input type="submit">
 </form>
+		</div>
+	</div>
+</div>
+
+
