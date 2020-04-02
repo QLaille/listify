@@ -7,17 +7,22 @@ const
 	userService = require('./user.js')
 ;
 
-function login(req, res, next) { // TODO error handling && duplicate users
+function login(req, res, next) {
 	try {
 		passport.authenticate('local', {session:false}, (error, user) => {
-			if (error || !user) {
+			if (error) {
 				console.log(error);
-				res.status(400).json({error});
+				res.status(500).redirect('/login?error=' + "us")
+			} else if (!user) {
+				res.status(400).redirect('/login?error=' + "noone");
+
 			} else {
-				const payload = {username: user.username, expires: Date.now() + parseInt(process.env.JWT_EXPIRATION_MS)};
+				date = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+				const payload = {uid: user.userid, expires: date};
 				req.login(payload, {session:false}, (error) => {
 					if (error) {
-						res.redirect('/'); // redirect to login but display an error
+						res.redirect("/login?error=wrong");
 					} else {
 						const token = jwt.sign(JSON.stringify(payload), secret.secretOrKey)
 						res.header('Cache-Control', 'private');
@@ -26,33 +31,59 @@ function login(req, res, next) { // TODO error handling && duplicate users
 					}
 				});
 			}
-		})(req,res);
+		})(req,res, next);
 	} catch (error) {
-// error
+		console.log(error);
+		res.redirect("/login?error=us");
 	}
 }
 
 async function register(req,res,next) {
 	try {
 		const {username, password, email} = req.body;
-		const ret = userService.createUser(username, password, email);
-		if (ret === username) {
-			res.status(200).send({ username }); //TODO redirect to home page
-		} else {
-			res.status(400).send({body:'Missing registration entry'});
-			res.status(400).send({});//TODO
-		}
-		// if (typeof username != 'undefined' || typeof password != 'undefined' || typeof email != 'undefined') {
-		// 	res.status(400).send({body:'Missing registration entry'});
-		// 	return;
-		// }
-		// // TODO minimal password size
-		// // TODO email not registered already
-		// const psswdHash = await bcrypt.hash(password, 10)
-		// const newUser = new User({username:username, password:psswdHash, userid: Date.now(), email:email})
+
+			const ret = await userService.createUser(username, password, email);
+			console.log(ret)
+			if (typeof ret === "string") {
+				switch (ret) {
+					case "exist":
+						res.redirect('/login?error=exist')
+						break;
+					case "email":
+						res.redirect('/login?error=email')
+						break;
+					case "password":
+						res.redirect('/login?error=psswd')
+						break;
+					case "username":
+						res.redirect('/login?error=usern')
+						break;
+					default:
+						break;
+				}
+			} else if (ret !== false && ret !== null) {
+				const date = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+				const payload = {uid: ret, expires: date};
+
+				req.login(payload, {session:false}, (error) => {
+					if (error) {
+						res.redirect('/login?error=' + "us");
+					} else {
+						const token = jwt.sign(JSON.stringify(payload), secret.secretOrKey)
+
+						res.header('Cache-Control', 'private');
+						res.cookie('jwt', token, {httpOnly:true, hostOnly:true,secure:false});
+						res.redirect('/home');
+					}
+				});
+			} else if (ret === false) {
+				res.redirect("/login?error=missing");
+			} else {
+				res.redirect("/login?error=us");
+			}
 	} catch (error) {
 		console.log(error);
-		res.status(400).send({});
+		res.redirect("/login?error=us");
 	}
 }
 

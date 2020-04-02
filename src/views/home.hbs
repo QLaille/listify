@@ -1,12 +1,13 @@
 <div class="home-wrapper">
 	<div class="pure-g">
 
-		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-3">
-			playlists
-			<ul>
+		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-24"></div>
+		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-4">
+			<h3>Your playlists</h3>
+			<ul class="pure-menu-list">
 			{{#each playlists}}
-				<li>
-					<a href="http://localhost:1234/playlist/{{this.id}}">{{this.name}}</a>
+				<li class="pure-menu-item">
+					<a class="pure-menu-link" href="http://localhost:1234/playlist/{{this.id}}">{{this.name}}</a>
 				</li>
 			{{/each}}
 			</ul>
@@ -14,20 +15,20 @@
 
 		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-3">
 			<div name="new-playlist">
-				<form action="playlist/new" method="POST">
-					New playlist name:
-					<input type="text" name="name" required>
-					<input type="submit" value="Create">
+				<form action="playlist/new" method="POST" class="pure-form pure-form-aligned" >
+					<label for="playlist-name">New playlist name:</label>
+					<input type="text" id="playlist-name" name="name" required placeholder="Name" pattern=".{4,}">
+					<input type="submit" value="Create" class="pure-button pure-button-primary">
 				</form>
 			</div>
 		</div>
 
 		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-3">
 			<div name="search-playlist">
-				<form action="search" method="GET">
-					Search for a playlist (or a creator):
-					<input type="text" name="search" required>
-					<input type="submit" value="Search">
+				<form action="search" method="GET" class="pure-form">
+					<label for="search">Search for a playlist (or a creator):</label>
+					<input type="text" id="search" name="search" required placeholder="Search">
+					<input type="submit" value="Search" class="pure-button pure-button-primary">
 				</form>
 			</div>
 		</div>

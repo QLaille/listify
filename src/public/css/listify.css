@@ -1,3 +1,7 @@
+body {
+	background-color: #f0f8ff;
+}
+
 .home-menu {
     padding: 0.5em;
     text-align: center;
@@ -120,7 +124,32 @@
     color: #aaa;
 }
 
+.home-wrapper {
+    position: absolute;
+    top: 13%;
+    width: 100%;
+    min-height: 12%;
+    z-index: 2;
+    background: #f0f8ff;
+}
 
+.login-button {
+	margin-top: 1em;
+}
+
+.error-login {
+	padding: 10px;
+	margin: 10px;
+	background: #fafafa;
+	color: #ba3939;
+	border: 1px solid #a33a3a;
+}
+
+
+.pure-img-responsive {
+	padding-top:1em;
+	padding-bottom:1em;
+}
 
 /*
  * -- TABLET (AND UP) MEDIA QUERIES --
@@ -177,15 +206,4 @@
     .splash-head {
         font-size: 300%;
     }
-}
-
-
-
-.home-wrapper {
-    position: absolute;
-    top: 13%;
-    width: 100%;
-    min-height: 12%;
-    z-index: 2;
-    background: white;
 }

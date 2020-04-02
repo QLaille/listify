@@ -1,12 +1,18 @@
 const Playlist = require('../database/models/playlist');
+const userService = require('./user');
 var ObjectId = require('mongoose').Types.ObjectId;
 
-function createPlaylist(userName = null, playlistName = null) { //TODO checking on username and playlist name (empty, duplicate, etc.)
+function createPlaylist(userid = null, playlistName = null) {
 	try {
-		if (playlistName === null || userName === null)
+		if (playlistName === null || userid === null)
 			return (false);//Incomplete
 
-		let playlist = new Playlist({name: playlistName, creator: userName});
+		const user = userService.searchUser(userid, null);
+		if (user === null || user === false) {
+			return (false);
+		}
+
+		let playlist = new Playlist({name: playlistName, creator: userid});
 
 		return playlist
 			.save()
@@ -56,7 +62,6 @@ function removePlaylist(playlistId = null) {
 	;
 }
 
-// TODO Check for invalid playlist names
 function updatePlaylistName(id = null, newName = null) {
 	if (id === null || newName === null)
 		return false;//Incomplete

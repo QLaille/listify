@@ -1,7 +1,25 @@
-<h1>{{profile}}</h1>
-{{#each playlists}}
-	<h3>{{this.name}}</h3>
-	{{#each this.songs}}
-		<h4>{{this}}</h4>
-	{{/each}}
-{{/each}}
+<div class="home-wrapper">
+	<div class="pure-g">
+		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-12"></div>
+		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-3">
+			<h1 class="content-head">{{profile}}</h1>
+		</div>
+		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-3">
+			<ul class="pure-menu-list">
+				{{#each playlists}}
+					<li class="pure-menu-item">
+						<h3><a class="pure-menu-heading" href="http://localhost:1234/playlist/{{this.id}}">{{this.name}}</a></h3>
+						<ul>
+							{{#each this.songs}}
+								<li class="pure-menu-item">
+									<h4 >{{this}}</h4>
+								</li>
+							{{/each}}
+						</ul>
+					</li>
+				{{/each}}
+			</ul>
+		</div>
+	</div>
+</div>
+

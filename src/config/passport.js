@@ -9,13 +9,17 @@ const secret = require('../../secret');
 passport.use(new LocalStrategy(function (username, password, done) {
 	try {
 		User.findOne({username:username}, (err, user) => {
-			bcrypt.compare(password, user.password, (err, match) => {
-				if (match) {
-					return done(null, user);
-				} else {
-					return done('Incorrect login');
-				}
-			});
+			if (user) {
+				bcrypt.compare(password, user.password, (err, match) => {
+					if (match) {
+						return done(null, user);
+					} else {
+						return done('Incorrect login');
+					}
+				});
+			} else {
+				return done("No User");
+			}
 		});
 	} catch (error) {
 // error

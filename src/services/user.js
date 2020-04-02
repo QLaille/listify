@@ -2,14 +2,28 @@ const User = require('../database/models/user');
 const bcrypt = require('bcrypt');
 
 
-async function createUser(userName = null, password = null, email = null) {
-	if (userName === null || password === null || email === null)
+async function createUser(username = null, password = null, email = null) {
+	if (username === null || password === null || email === null)
 		return (false);//Incomplete
 
 	try {
-	// TODO minimal password size && email not registered already
-		const psswdHash = await bcrypt.hash(password, 10);
-		const newUser = new User({username:userName, password:psswdHash, userid: Date.now(), email:email});
+		users = await searchUser(null, username);
+		if (users !== false && users !== null && users.length !== 0) {
+			return ("exist");
+		}
+		emailCheck = new RegExp("[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}")
+		usernCheck = new RegExp(".{7,32}")
+		psswdCheck = new RegExp(/^(?=.*[0-9A-Za-z])(?=.*\d)[0-9A-Za-z\d]{12,}$/g)
+		if (!emailCheck.test(email)) {
+			return ("email");
+		} else if (!psswdCheck.test(password)) {
+			return ("password");
+		} else if (!usernCheck.test(username)) {
+			return ("username");
+		}
+
+	const psswdHash = await bcrypt.hash(password, 10);
+		const newUser = new User({username:username, password:psswdHash, userid: Date.now(), email:email});
 
 		return newUser
 			.save()
@@ -28,8 +42,6 @@ function searchUser(id = null, name = null) {
 		return (false);//Incomplete
 
 	if (id === null) {
-// TODO search users by search name term
-
 		return User
 			.find({"username": {$regex: name, $options: 'i'}})
 			.then((users) => {
@@ -63,7 +75,10 @@ function searchUser(id = null, name = null) {
 	}
 }
 
-function deleteUser(id = null) { //TODO restrict to admin / local
+function deleteUser(id = null, secret = null) {
+	if (secret === null) {
+		return false;
+	}
 	if (id === null)
 		return (false);//Incomplete
 

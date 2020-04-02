@@ -2,22 +2,22 @@ const passport = require('passport');
 const playlist = require('../services/playlist');
 const user = require('../services/user');
 
-
-// TODO: error handling
 async function index (req, res, next) {
 	passport.authenticate('jwt', {session:false}, async (err, user, info) => {
 		if (err != null || user === false) {
 			res.redirect('/login')
 			return;
 		}
-		const playlists = await playlist.playlistSearch(null, user.username, null) // cache those playlists in case user clicks on one of them
+		console.log(user);
+		const playlists = await playlist.playlistSearch(null, user.uid, null)
+		console.log(playlists);
 		const context = {
-			playlists: playlists.map(p => {
+			playlists: playlists ? playlists.map(p => {
 				return {
 					name: p.name,
 					id: p._id
 				}
-			})
+			}) : null
 		};
 
 		res.render('home', {
@@ -30,26 +30,21 @@ async function index (req, res, next) {
 	})(req,res,next);
 }
 
-/*
-** Profile of user
-** // TODO: if profile page is current user, add extra form for settings
-*/
 async function profile (req, res, next) {
 	passport.authenticate('jwt', {session:false}, async (err, usr, info) => {
 		if (err != null || usr === false) {
 			res.redirect('/login')
 			return;
 		}
-		const profile = await user.searchUser(null, req.params.name);
-		const playlists = await playlist.playlistSearch(null, req.params.name, null);
+		const playlists = await playlist.playlistSearch(null, usr.uid, null);
 		const context = {
-			playlists: playlists.map(p => {
+			playlists: playlists ? playlists.map(p => {
 				return {
 					name: p.name,
 					songs:p.songs,
-					id: p.id
+					id: p._id
 				}
-			})
+			}) : null
 		};
 
 		// console.log(profile)
@@ -67,15 +62,13 @@ async function profile (req, res, next) {
 	})(req,res,next);
 }
 
-/*
-** //TODO  error handling
-*/
 async function showPlaylist(req, res, next) {
 	passport.authenticate('jwt', {session:false}, async (err, usr, info) => {
 		if (err != null || usr === false) {
 			res.redirect('/login')
 			return;
 		}
+		let creator = await user.searchUser(usr.uid, null);
 		const list = await playlist.playlistSearch(req.params.id);
 		const context = {
 			playlist: {
@@ -86,7 +79,7 @@ async function showPlaylist(req, res, next) {
 			}
 		}
 		let canAdd = false;
-		if (list.creator === usr.username)
+		if (list.creator === usr.uid)
 			canAdd = true;
 
 		if (!list) {
@@ -95,15 +88,15 @@ async function showPlaylist(req, res, next) {
 			res.render('playlist', {
 				layout: 'default',
 				playlist: context.playlist,
-				isLoggedIn: true,
 				canAddSong: canAdd,
+				isLoggedIn: true,
+
+				creator:creator.username,
 				allowProtoMethodsByDefault: true,
 				allowProtoPropertiesByDefault: true
 			});
 		}
 	})(req,res,next);
-
-
 }
 
 async function search(req, res, next) {
@@ -116,16 +109,12 @@ async function search(req, res, next) {
 		let users = await user.searchUser(null, searchTerm);
 		let playlists = await playlist.playlistSearch(null, null, searchTerm);
 
-		// console.log(req.query)
-		// console.log(playlists)
 		let p = playlists.map((p) => {
 			return {
 				name: p.name,
 				id: p._id,
 			};
-			// return p.toObject();
 		});
-
 
 		const context = {
 			playlists: p,
@@ -141,28 +130,26 @@ async function search(req, res, next) {
 	})(req,res,next);
 }
 
-function postNewPlaylist(req, res, next) {
+async function postNewPlaylist(req, res, next) {
 	passport.authenticate('jwt', {session:false}, async (err, user, info) => {
-		if (err != null || usr === false) {
+		if (err != null || user === false) {
 			res.redirect('/login')
 			return;
 		} else {
-			playlist.createPlaylist(user.username, req.body.name);
-			res.redirect('/home'); //redirect to newly created playlist ?
+			await playlist.createPlaylist(user.uid, req.body.name);
+			res.redirect('/home');
 		}
 	})(req,res,next);
 }
 
-
 async function addSongToPlaylist(req, res, next) {
 	passport.authenticate('jwt', {session:false}, async (err, user, info) => {
-		if (err != null || usr === false) {
+		if (err != null || user === false) {
 			res.redirect('/login')
 			return;
 		}
 		const r = await playlist.addSongToPlaylist(req.params.id, req.body.name);
 		if (r === false) {
-// song already in there
 		} else if (r != true) {
 			// error
 		} else {
@@ -176,7 +163,6 @@ module.exports = {
     index: index,
 	profile: profile,
 	showPlaylist: showPlaylist,
-	// showAllPlaylist: showAllPlaylist,
 	postNewPlaylist: postNewPlaylist,
 	addSongToPlaylist: addSongToPlaylist,
 	search:search

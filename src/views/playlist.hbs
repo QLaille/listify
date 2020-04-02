@@ -1,24 +1,28 @@
 <div class="home-wrapper">
 	<div class="pure-g">
+		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-12"></div>
 		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-3">
-			<h3>{{playlist.name}}</h3>
-			<div>
-				<ul>
-					{{#each playlist.songs}}
-						<li>{{this}}</li>
-					{{/each}}
-				</ul>
-			</div>
+			<h3 class="content-subhead">{{playlist.name}}</h3>
+			<h4 class="pure-form-message">A playlist by: <a href="http://localhost:1234/@/{{creator}}" class="pure-menu-heading">{{creator}}</a></h4>
+		</div>
 
+		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-3">
+			<ul>
+				{{#each playlist.songs}}
+					<li>{{this}}</li>
+				{{/each}}
+			</ul>
+		</div>
+
+
+<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-4">
 {{#if canAddSong}}
 <div name="add_song">
-	Add new song
-	<form action="{{playlist.id}}" method="POST">
+	<span class="pure-form-message">Add a song.</span>
+	<form action="{{playlist.id}}" method="POST" class="pure-form pure-form-stacked">
 		<input name="name" type="text"><br>
-		<input type="submit" value="Add">
+		<input type="submit" value="Add" class="pure-button pure-button-primary">
 	</form>
 </div>
 {{/if}}
 </div>
-		</div>
-	</div>
