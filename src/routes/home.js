@@ -10,4 +10,7 @@ module.exports = Router({mergeParams: true})
 .get('/search', homeController.search)
 .post('/playlist/new', homeController.postNewPlaylist)
 .post('/playlist/:id', homeController.addSongToPlaylist)
+.get('/song/:id', homeController.songPage)
+.get('/confirm', homeController.confirmPage)
+.post('/confirm/:playlistId/:songId', homeController.addSongToPlaylist)
 ;

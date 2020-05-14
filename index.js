@@ -25,7 +25,10 @@ app.use(cors({ origin:true, credentials:true }));
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
 app.use('/', router);
-
+app.use(function (err, req, res, next) {
+	console.error(err.stack)
+	res.status(404).render('404.ejs')
+  });
 app.engine('hbs', hbs({
 	extname: 'hbs',
 	defaultView: 'default',

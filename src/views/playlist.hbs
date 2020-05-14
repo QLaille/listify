@@ -1,4 +1,17 @@
 <div class="home-wrapper">
+
+		{{#if serverSideError}}
+			<div class="pure-g">
+				<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-3"></div>
+				<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-4">
+					<div class="error-login">
+						{{serverSideError}}
+					</div>
+				</div>
+			</div>
+		{{/if}}
+
+
 	<div class="pure-g">
 		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-12"></div>
 		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-3">
@@ -9,7 +22,11 @@
 		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-3">
 			<ul>
 				{{#each playlist.songs}}
-					<li>{{this}}</li>
+					{{#if this.title}}
+						<li><a href="http://localhost:1234/song/{{this.id}}">{{this.title.value}}</a></li>
+					{{else}}
+						<li>{{this}}</li>
+					{{/if}}
 				{{/each}}
 			</ul>
 		</div>
@@ -17,12 +34,12 @@
 
 <div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-4">
 {{#if canAddSong}}
-<div name="add_song">
-	<span class="pure-form-message">Add a song.</span>
-	<form action="{{playlist.id}}" method="POST" class="pure-form pure-form-stacked">
-		<input name="name" type="text"><br>
-		<input type="submit" value="Add" class="pure-button pure-button-primary">
-	</form>
-</div>
+	<div name="add_song">
+		<span class="pure-form-message">Add a song.</span>
+		<form action="{{playlist.id}}" method="POST" class="pure-form pure-form-stacked">
+			<input name="name" type="text"><br>
+			<input type="submit" value="Add" class="pure-button pure-button-primary">
+		</form>
+	</div>
 {{/if}}
 </div>

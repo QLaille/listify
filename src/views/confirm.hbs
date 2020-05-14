@@ -1,0 +1,30 @@
+<div class="home-wrapper">
+	<div class="pure-g">
+		<div class="l-box pure-u-2 pure-u-md-1-4 pure-u-lg-1-6"></div>
+		<div class="l-box pure-u-2 pure-u-md-1-3 pure-u-lg-1-4"></div>
+
+		<div class="l-box pure-u-2 pure-u-md-1-3 pure-u-lg-1-4">
+			<div name="user_search">
+				<h3>We found multiple song with that name, choose one to add:</h3>
+				<ul class="pure-menu-list">
+					{{#each songs}}
+						<li class="pure-menu-item pure-g">
+							<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-2">
+								<form style="display:flex;" class="pure-form pure-form-stacked" action="confirm/{{../playlist}}/{{this.id}}" method="POST">
+								<a href="http://localhost:1234/song/{{this.id}}" class="pure-menu-heading">{{this.title.value}}</a>
+
+								<label for="add-{{this.id}}" class="pure-button pure-button-primary login-button">Add</label>
+								<input id="add-{{this.id}}" style="visibility:hidden;" type="submit">
+								</form>
+							</div>
+						</li>
+					{{/each}}
+				</ul>
+			</div>
+		</div>
+
+		<div class="l-box pure-u-2 pure-u-md-1-3 pure-u-lg-1-4"></div>
+
+	</div>
+</div>
+

@@ -22,7 +22,7 @@ async function createUser(username = null, password = null, email = null) {
 			return ("username");
 		}
 
-	const psswdHash = await bcrypt.hash(password, 10);
+		const psswdHash = await bcrypt.hash(password, 10);
 		const newUser = new User({username:username, password:psswdHash, userid: Date.now(), email:email});
 
 		return newUser
