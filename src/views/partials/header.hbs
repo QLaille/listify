@@ -8,7 +8,11 @@
 						<a href="http://localhost:1234/home" class="pure-menu-link">Home</a>
 					</li>
 					<li class="pure-menu-item">
-						<a href="http://localhost:1234/logout" class="pure-menu-link">Log out</a>
+						<form action="v1/auth/logout" method="POST">
+
+							<button type="submit" class="pure-menu-link masked-button" ="logout"><a>Log out</a></button>
+						</form>
+						{{!-- <a href="http://localhost:1234/logout" class="pure-menu-link">Log out</a> --}}
 					</li>
 				{{else}}
 					<li class="pure-menu-item">

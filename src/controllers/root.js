@@ -1,12 +1,12 @@
 const passport = require('passport');
 
-function index (req, res, next) {
+function indexPage (req, res, next) {
 	res.render('index', {
 		layout:'default',
 	});
 }
 
-function login (req, res, next) {
+function loginPage (req, res, next) {
 
 	var queryError = req.query.error ? req.query.error : "";
 	var errorMsg = "";
@@ -56,6 +56,6 @@ function login (req, res, next) {
 }
 
 module.exports = {
-    index: index,
-	login: login
+    indexPage: indexPage,
+	loginPage: loginPage
 };

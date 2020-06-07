@@ -15,10 +15,12 @@
 
 		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-3">
 			<div name="new-playlist">
-				<form action="playlist/new" method="POST" class="pure-form pure-form-aligned" >
+				<form action="v1/playlist" method="POST" class="pure-form pure-form-aligned" >
 					<label for="playlist-name">New playlist name:</label>
 					<input type="text" id="playlist-name" name="name" required placeholder="Name" pattern=".{4,}">
 					<input type="submit" value="Create" class="pure-button pure-button-primary">
+					<label for="private-setting" class="pure-checkbox">
+						<input type="checkbox" name="private" id="private-setting" value="private">Make that playlist private</label>
 				</form>
 			</div>
 		</div>

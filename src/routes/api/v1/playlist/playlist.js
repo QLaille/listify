@@ -1,52 +1,41 @@
 const
-	Router = require('express').Router
-	playlist = require('../../../../services/playlist');
+	Router = require('express').Router,
+	PlaylistService = require('../../../../services/playlist'),
+	HomeController = require('../../../../controllers/home')
 ;
+const passport = require('passport');
+
 
 module.exports = Router({mergeParams: true})
 
-// TODO add restriction to playlist name (US-ASCII)
-// create new playlist
+/*
+** Create new playlist
+*/
 .post('/v1/playlist', async (req,res,next) => {
-	const username = req.body.username;
-	const playlistName = req.body.playlistName;
-	let ret = await  playlist.createPlaylist(username, playlistName);
-
-	if (ret === null)
-		res.sendStatus(500);
-	else if (ret === false)
-		res.sendStatus(400);
-	else
-		res.send(ret);
+	passport.authenticate('jwt', {session:false}, async (err, user, info) => {
+		if (err != null || user === false) {
+			res.redirect('/login')
+			return;
+		}
+		HomeController.createNewPlaylist(req, res, next, user);
+	})(req,res,next);
 })
 
-// TODO consider search playlist by name
-// get ONE(1) playlist with id or creator+name
-.get('/v1/playlist', async (req,res,next) => { //TODO merge with the search route but add more params ?
-	const creator = req.body.creator;
-	const name = req.body.name;
-	const id = req.body.id;
+/*
+** Delete one playlist
+** This is a GET because forms dont handle DELETE requests
+*/
+.get('/v1/playlist/:id/delete', async (req,res,next) => {
+	passport.authenticate('jwt', {session:false}, async (err, user, info) => {
+		if (err != null || user === false) {
+			res.redirect('/login')
+			return;
+		}
 
-	let ret = await  playlist.playlistSearch(id, creator, name);
+		const id = req.params.id;
+		await PlaylistService.removePlaylist(id);
 
-	if (ret === null) // Reverse order because it is a get
-		res.send(500);
-	else if (ret === false)
-		res.send(400);
-	else
-		res.send(ret);
-})
-
-// delete one playlist
-.delete('/v1/playlist', async (req,res,next) => { //TODO Add security to the delete
-	const id = req.body.id;
-	let ret = await playlist.removePlaylist(id);
-
-	if (ret === true)
-		res.sendStatus(200);
-	else if (ret === null)
-		res.sendStatus(400);
-	else
-		res.sendStatus(500);
+		res.redirect('/home');
+	})(req,res,next);
 })
 ;

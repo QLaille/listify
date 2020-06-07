@@ -3,8 +3,6 @@ const
 ;
 
 module.exports = Router({mergeParams: true})
-// .get('/v1/users/:id/password', )
-// .post('/v1/users', )
 .put('/v1/users/:id/password', async (req,res,next) => {
 	try {
 		const user = await req.db.Users.findById(req.params.id); // to change
@@ -15,4 +13,3 @@ module.exports = Router({mergeParams: true})
 		next(error);
 	}
 });
-// .delete('/v1/users', )

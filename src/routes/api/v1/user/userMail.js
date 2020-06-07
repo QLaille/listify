@@ -3,8 +3,6 @@ const
 ;
 
 module.exports = Router({mergeParams: true})
-.get('/v1/users/:id/email')
-// .post('/v1/users/:id/email', )
 .put('/v1/users/:id/email', async (req,res,next) => {
 	try {
 		const user = await req.db.Users.findById(req.params.id);

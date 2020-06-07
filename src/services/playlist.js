@@ -1,23 +1,24 @@
-const Playlist = require('../database/models/playlist');
-const userService = require('./user');
-var ObjectId = require('mongoose').Types.ObjectId;
-const RDF = require('../database/rdf.js');
+const
+	PlaylistModel = require('../database/models/playlist'),
+	UserService = require('./user'),
+	ObjectId = require('mongoose').Types.ObjectId,
+	RDF = require('../database/rdf.js')
+;
 
-function createPlaylist(userid = null, playlistName = null) {
+function createPlaylist(userId = null, playlistName = null, privacy = false) {
 	try {
-		if (playlistName === null || userid === null)
+		console.log(userId);
+		console.log(playlistName);
+		if (playlistName === null || userId === null)
 			return (false);//Incomplete
-
-		const user = userService.searchUser(userid, null);
-		if (user === null || user === false) {
+		const user = UserService.searchUser(userId, null);
+		if (user === null || user === false)
 			return (false);
-		}
 
-		let playlist = new Playlist({name: playlistName, creator: userid});
-
+		const playlist = new PlaylistModel({name: playlistName, creator: userId, private: privacy});
 		return playlist
 			.save()
-			.then((playlist) => {return playlist._id})//Ok
+			.then((p) => {return p._id})//Ok
 			.catch((err) => {console.log(err);return null})//Err
 		;
 	} catch (error) {
@@ -32,22 +33,22 @@ function playlistSearch(id = null, creator = null, name = null) {
 		return (false); //Incomplete
 
 	if (id !== null) {
-		return Playlist
+		return PlaylistModel
 			.findById(id)
-			.then((playlist) => {return (playlist);})
-			.catch((err) => {console.log(err); return (null);})
+			.then((playlist) => {return (playlist);})//Ok
+			.catch((err) => {console.log(err); return (null);})//Err
 		;
 	} else if (creator !== null) {
-		return Playlist
+		return PlaylistModel
 			.find({"creator": creator})
-			.then((playlists) => {return playlists;})
-			.catch((err) => {console.log(err); return (null);})
+			.then((playlists) => {return playlists;})//Ok
+			.catch((err) => {console.log(err); return (null);})//Err
 		;
 	} else if (name !== null) {
-		return Playlist
-			.find({"name": {$regex: name, $options: 'i'}})
-			.then((playlists) => {return playlists;})
-			.catch((err) => {console.log(err); return (null);})
+		return PlaylistModel
+			.find({"name": {$regex: name, $options: 'i'}, "private": false})
+			.then((playlists) => {return playlists;})//Ok
+			.catch((err) => {console.log(err); return (null);})//Err
 		;
 	}
 }
@@ -56,10 +57,10 @@ function removePlaylist(playlistId = null) {
 	if (playlistId === null)
 		return false; //Incomplete
 
-	return Playlist
+	return PlaylistModel
 		.findByIdAndDelete(playlistId)
 		.then(() => {return(true);})//Ok
-		.catch((err) => {console.log(err)})//Err
+		.catch((err) => {console.log(err); return null;})//Err
 	;
 }
 
@@ -67,10 +68,10 @@ function updatePlaylistName(id = null, newName = null) {
 	if (id === null || newName === null)
 		return false;//Incomplete
 
-	return Playlist
+	return PlaylistModel
 		.findOneAndUpdate({"_id": new ObjectId(id)}, {$set:{name: newName}})
-		.then(() => {return true;})
-		.catch((err) => {console.log(err); return null;})
+		.then(() => {return true;})//Ok
+		.catch((err) => {console.log(err); return null;})//Err
 	;
 }
 
@@ -78,10 +79,10 @@ function getSongsFromPlaylist(playlistId = null) {
 	if (playlistId === null)
 		return (false);// Incomplete
 
-	return Playlist
+	return PlaylistModel
 		.findById(playlistId)
-		.then((playlist) => {return (playlist.songs);})
-		.catch((err) => {console.log(err); return (null);})
+		.then((playlist) => {return (playlist.songs);})//Ok
+		.catch((err) => {console.log(err); return (null);})//Err
 	;
 }
 
@@ -89,67 +90,74 @@ function addSongToPlaylist(playlistId = null, newSong = null) {
 	if (playlistId === null || newSong === null)
 		return (false); //Incomplete
 
-	return Playlist
+	return PlaylistModel
 		.findByIdAndUpdate(playlistId, {$push: {songs:newSong}})
-		.then(() => {return true;})
-		.catch((err) => {console.log(err); return null;})
+		.then(() => {return true;})//Ok
+		.catch((err) => {console.log(err); return null;})//Err
 	;
 }
 
-function removeSongFromPlaylist(playlistId = null, name = null) {
-	if (playlistId === null || name === null)
+function removeSongFromPlaylist(playlistId = null, songId = null) {
+	if (playlistId === null || songId === null)
 		return (false); //Incomplete
 
-	return Playlist
-		.findByIdAndUpdate(playlistId, {$pull: {songs:name}})
-		.then(() => {return true;})
-		.catch((err) => {console.log(err); return null;})
+	return PlaylistModel
+		.findByIdAndUpdate(playlistId, {$pull: {songs:{id:songId}}})
+		.then(() => {return true;})//Ok
+		.catch((err) => {console.log(err); return null;})//Err
 	;
 }
 
-async function handleSongSearch(ar) {
+function filterUniqueMBSongs(mbSongs) {
 	var mbFilteredSongs = [];
 
-	localSongs = ar[0].body.results.bindings.map((s) => {
+	for (song of mbSongs) {
+		filtered = mbFilteredSongs.filter(s => {return s.id === song.id})
+		if (filtered.length === 0)
+			mbFilteredSongs.push(song);
+	}
+	return (mbFilteredSongs);
+}
+
+async function handleSongSearch(requests) {
+
+	var localSongs = requests[0].body.results.bindings.map((s) => {
 		path = s.id.value;
 		return {
 			id: path.substr(path.lastIndexOf('/') + 1),
 			title: s.title,
 		};
 	});
-	mbSongs = await Promise.all(ar[1].results.bindings.map(async (s) => {
+
+	const mbSongs = await Promise.all(requests[1].results.bindings.map(async (s) => {
 		path = s.id.value;
 		trackId = path.substr(path.lastIndexOf('/') + 1)
 		subQuery = `SELECT DISTINCT ?property ?hasValue ?isValueOf WHERE {{ <http://dbtune.org/musicbrainz/resource/track/${trackId}> ?property ?hasValue }UNION{ ?isValueOf ?property <http://dbtune.org/musicbrainz/resource/track/${trackId}> }}ORDER BY (!BOUND(?hasValue)) ?property ?hasValue ?isValueOf`
 
-		return RDF.musicBrainz(subQuery).then(async (res)=> {
+		return RDF.musicBrainz(subQuery).then(async (res) => {
 			trackJson = await res.json();
-			return {
+			return ({
 				id: path.substr(path.lastIndexOf('/') + 1),
 				title:trackJson.results.bindings[1].hasValue.type === "literal" ? trackJson.results.bindings[1].hasValue : "",
-			};
+			});
 		})
 	}));
-	for (song of mbSongs) {
-		filtered = mbFilteredSongs.filter(s => {return s.id === song.id})
-		if (filtered.length === 0)
-			mbFilteredSongs.push(song);
-	}
-	// console.log(localSongs.concat(mbFilteredSongs));
+
+	const mbFilteredSongs = filterUniqueMBSongs(mbSongs);
 	return (localSongs.concat(mbFilteredSongs));
 
 }
 
 function handleSingleSongSearch(id, ar) {
 	if (id.match(/track-[0-9]{1,}/gm) != null) {
-		return {
+		return ({
 			id: id,
 			artist: ar[0].body.results.bindings[0].artist,
 			title: ar[0].body.results.bindings[0].title
-		};
+		});
 	} else {
-			path = ar[0].results.bindings[7].hasValue.value
-			artistQuery = `SELECT DISTINCT ?property ?hasValue ?isValueOf WHERE {  { <${path}> ?property ?hasValue }  UNION  { ?isValueOf ?property <${path}> }}ORDER BY (!BOUND(?hasValue)) ?property ?hasValue ?isValueOf`
+			const path = ar[0].results.bindings[7].hasValue.value
+			const artistQuery = `SELECT DISTINCT ?property ?hasValue ?isValueOf WHERE { { <${path}> ?property ?hasValue }  UNION  { ?isValueOf ?property <${path}> }}ORDER BY (!BOUND(?hasValue)) ?property ?hasValue ?isValueOf`
 			return RDF.musicBrainz(artistQuery).then(async (res) => {
 				json = await res.json();
 				label = json.results.bindings.find(elem => elem.property.value === "http://www.w3.org/2000/01/rdf-schema#label")

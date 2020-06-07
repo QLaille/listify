@@ -15,7 +15,7 @@
 		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-4"></div>
 		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-3">
 			<h3>Login</h3>
-			<form action="login" method="POST" class="pure-form pure-form-stacked">
+			<form action="v1/auth/login" method="POST" class="pure-form pure-form-stacked">
 				<label for="login-usern">Username</label>
 				<input name="username" id="login-usern" type="text" required pattern=".{7,32}" placeholder="Username">
 
@@ -28,11 +28,13 @@
 
 		<div class="l-box pure-u-2 pure-u-md-1-2 pure-u-lg-1-3">
 			{{#if errorRegister}}
-			<span>mdr</span>
+					<div class="error-login">
+						{{errorRegister}}
+					</div>
 			{{/if}}
 			<h3>Register</h3>
 			<span class="pure-form-message">All fields are required.</span>
-			<form action="register" method="POST" class="pure-form pure-form-stacked">
+			<form action="v1/auth/register" method="POST" class="pure-form pure-form-stacked">
 				<label for="login-email">Email</label>
 				<input name="email" id="login-email" type="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}"  placeholder="Email">
 

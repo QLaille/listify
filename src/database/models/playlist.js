@@ -4,7 +4,8 @@ const playlistSchema = new mongoose.Schema({
     name: String,
 	id: String,
 	creator: String,
-	songs: [Object] // lastfm reference
+	songs: [Object],
+	private: Boolean
 });
 
 const Playlist = mongoose.model('Playlist', playlistSchema);

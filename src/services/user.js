@@ -1,6 +1,7 @@
-const User = require('../database/models/user');
-const bcrypt = require('bcrypt');
-
+const
+	bcrypt = require('bcrypt'),
+	UserModel = require('../database/models/user')
+;
 
 async function createUser(username = null, password = null, email = null) {
 	if (username === null || password === null || email === null)
@@ -23,7 +24,7 @@ async function createUser(username = null, password = null, email = null) {
 		}
 
 		const psswdHash = await bcrypt.hash(password, 10);
-		const newUser = new User({username:username, password:psswdHash, userid: Date.now(), email:email});
+		const newUser = new UserModel({username:username, password:psswdHash, userid: Date.now(), email:email});
 
 		return newUser
 			.save()
@@ -42,7 +43,7 @@ function searchUser(id = null, name = null) {
 		return (false);//Incomplete
 
 	if (id === null) {
-		return User
+		return UserModel
 			.find({"username": {$regex: name, $options: 'i'}})
 			.then((users) => {
 				const safe = users.map(user => {
@@ -56,14 +57,13 @@ function searchUser(id = null, name = null) {
 			.catch((err) => {console.log(err); return null;})
 		;
 	} else {
-		return User
-			.findById(id)
+		return UserModel
+			.find({"userid": {$regex: id}})
 			.then((user) => {
 				if (user !== null) {
-					const safe = user.toObject();
+					const safe = user[0].toObject();
 					delete safe.password;
 					delete safe.email;
-					console.log(safe);
 					return (safe); // Ok
 				} else {
 					return (false);//Nothing
@@ -82,7 +82,7 @@ function deleteUser(id = null, secret = null) {
 	if (id === null)
 		return (false);//Incomplete
 
-	return User
+	return UserModel
 		.findByIdAndDelete(id)
 		.then(() => {return true;}) // Ok
 		.catch((err) => {console.log(err); return null;}) // Err
@@ -93,7 +93,7 @@ function updateUserName(id = null, newName = null) {
 	if (id === null || newName === null)
 		return (false);//Incomplete
 
-	return User
+	return UserModel
 		.findByIdAndUpdate(id, {$set: {username: newName}})
 		.then(() => {return true;})
 		.catch((err) => {console.log(err); return null;})
@@ -104,7 +104,7 @@ function updateUserMail(id = null, newMail = null) {
 	if (id === null || newMail === null)
 		return (false);//Incomplete
 
-	return User
+	return UserModel
 		.findByIdAndUpdate(id, {$set: {email: newMail}})
 		.then(() => {return true;})
 		.catch((err) => {console.log(err); return null;})

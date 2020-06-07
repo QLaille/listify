@@ -4,7 +4,7 @@ const
 ;
 
 module.exports = Router({mergeParams: true})
-//change playlist name, provide ID //TODO check if it is the creator which wants to update the name
+//change playlist name, provide ID
 .put('/v1/playlist/name', async (req,res,next) => {
 	const id = req.body.id;
 	const newName = req.body.new;

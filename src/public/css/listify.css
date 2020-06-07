@@ -145,11 +145,19 @@ body {
 	border: 1px solid #a33a3a;
 }
 
+/* .editable .edit-toggle:checked #delete-icon {
+	display:block;
+} */
+
+.delete-icon {
+	position:absolute;
+}
 
 .pure-img-responsive {
 	padding-top:1em;
 	padding-bottom:1em;
 }
+
 
 /*
  * -- TABLET (AND UP) MEDIA QUERIES --
