@@ -1,6 +1,6 @@
 const
 	Router = require('express').Router
-	authService = require('../../../../services/authentication')
+	authService = require('../../../services/authentication')
 ;
 
 module.exports = Router({mergeParams: true})

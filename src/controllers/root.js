@@ -50,9 +50,7 @@ function loginPage (req, res, next) {
 			SelfPage: true,
 			errorMsg: errorMsg
 		});
-
 	})(req,res,next);
-
 }
 
 module.exports = {

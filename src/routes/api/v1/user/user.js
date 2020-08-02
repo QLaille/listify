@@ -1,7 +1,8 @@
 const
-	Router = require('express').Router
-	user = require('../../../../services/user');
+	Router = require('express').Router,
+	user = require('../../../../services/user'),
 ;
+const passport = require('passport');
 
 module.exports = Router({mergeParams: true})
 // create new user
@@ -31,8 +32,9 @@ module.exports = Router({mergeParams: true})
 		res.send(ret);
 })
 // delete one user
-.delete('/v1/user', async (req,res,next) => {
-	const id = req.body.id;
+.delete('/v1/user', passport.authenticate('jwt', {session:false, , failureRedirect:'/login'}), async (req,res,next) => {
+// TODO check if user to modify is same as the one logged in
+const id = req.body.id;
 
 	let ret = await  user.deleteUser(id);
 
@@ -44,8 +46,8 @@ module.exports = Router({mergeParams: true})
 		res.sendStatus(200);
 })
 // change user name
-.put('/v1/user/name', async (req,res,next) => {
-
+.put('/v1/user/name', passport.authenticate('jwt', {session:false, , failureRedirect:'/login'}), async (req,res,next) => {
+// TODO check if user to modify is same as the one logged in
 	const id = req.body.id;
 	const newName = req.body.name;
 
@@ -58,7 +60,8 @@ module.exports = Router({mergeParams: true})
 		res.sendStatus(200);
 })
 // change user email
-.put('/v1/user/mail', async (req,res,next) => {
+.put('/v1/user/mail', passport.authenticate('jwt', {session:false, , failureRedirect:'/login'}), async (req,res,next) => {
+// TODO check if user to modify is same as the one logged in
 	const id = req.body.id;
 	const newMail = req.body.mail;
 

@@ -1,69 +1,37 @@
 const
 	Router = require('express').Router,
 	RootController = require('../controllers/root'),
-	HomeController = require('../controllers/home')
+	HomeController = require('../controllers/home'),
 ;
 const passport = require('passport');
 
-
 module.exports = Router({mergeParams: true})
+
 .get('/', RootController.indexPage)
+
 .get('/login', RootController.loginPage)
 
-.get('/home', async (req,res,next) => {
-	passport.authenticate('jwt', {session:false}, async (err, user, info) => {
-		if (err != null || user === false) {
-			res.redirect('/login')
-			return;
-		}
-		HomeController.index(req,res,next, user);
-	})(req,res,next);
-})
-.get('/search', async (req,res,next) => {
-	passport.authenticate('jwt', {session:false}, async (err, user, info) => {
-		if (err != null || user === false) {
-			res.redirect('/login')
-			return;
-		}
-		HomeController.searchPage(req,res,next);
-	})(req,res,next);
-})
-.get('/confirm', async (req,res,next) => {
-	passport.authenticate('jwt', {session:false}, async (err, user, info) => {
-		if (err != null || user === false) {
-			res.redirect('/login')
-			return;
-		}
-		HomeController.confirmPage(req,res,next);
-	})(req,res,next);
+.get('/home', passport.authenticate('jwt', {session:false, failureRedirect:'/login'}), (req,res,next) => {
+	HomeController.index(req,res,next, req.user);
 })
 
-.get('/playlist/:id', async (req,res,next) => {
-	passport.authenticate('jwt', {session:false}, async (err, user, info) => {
-		if (err != null || user === false) {
-			res.redirect('/login')
-			return;
-		}
-		HomeController.showPlaylistPage(req,res,next,user);
-	})(req,res,next);
+.get('/search', passport.authenticate('jwt', {session:false, failureRedirect:'/login'}), (req,res,next) => {
+	HomeController.searchPage(req,res,next);
+})
+.get('/confirm', passport.authenticate('jwt', {session:false, failureRedirect:'/login'}), (req,res,next) => {
+	HomeController.confirmPage(req,res,next);
 })
 
-.get('/@/:name', async (req,res,next) => {
-	passport.authenticate('jwt', {session:false}, async (err, user, info) => {
-		if (err != null || user === false) {
-			res.redirect('/login')
-			return;
-		}
-		HomeController.profilePage(req,res,next,user);
-	})(req,res,next);
+.get('/playlist/:id', passport.authenticate('jwt', {session:false, failureRedirect:'/login'}), (req,res,next) => {
+	HomeController.showPlaylistPage(req,res,next,req.user);
 })
 
-.get('/song/:id', async (req,res,next) => {
-	passport.authenticate('jwt', {session:false}, async (err, user, info) => {
-		if (err != null || user === false) {
-			res.redirect('/login')
-			return;
-		}
-		HomeController.requestSongPage(req,res,next);
-	})(req,res,next)
-});
+.get('/@/:name', passport.authenticate('jwt', {session:false, failureRedirect:'/login'}), (req,res,next) => {
+	HomeController.profilePage(req,res,next,req.user);
+})
+
+.get('/song/:id', passport.authenticate('jwt', {session:false, failureRedirect:'/login'}), (req,res,next) => {
+	HomeController.requestSongPage(req,res,next);
+})
+
+;

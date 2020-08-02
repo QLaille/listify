@@ -14,7 +14,7 @@ function loginUser(req, res, next) {
 			} else if (!user) {
 				res.status(400).redirect('/login?error=' + "noone");
 			} else {
-				const date = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+				const date = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); //TODO check how to renew a jwt token
 				const payload = {uid: user.userid, expires: date};
 
 				req.login(payload, {session:false}, (error) => {
@@ -92,6 +92,44 @@ async function logoutUser(req, res, next) {
 		res.redirect('/login');
 	}
 }
+
+// function authenticate(req, res, next) {
+// 	// console.log(req.cookies);
+// 	// console.log("oui");
+// 	// console.log(req.isAuthenticated());
+
+// // 	passport.authenticate('jwt', {session:false}, async (err, user, info) => {
+// // 		if (err != null || user === false) {
+// // 			res.redirect('/login')
+// // 			return;
+// // 		}
+// // 		HomeController.profilePage(req,res,next,user);
+// // 	})(req,res, next);
+// 	// passport.authenticate('jwt', {session:false}, async (err, user, info) => {
+
+// 	// })(req,res, next);
+
+//     if (req.isAuthenticated()) {
+// 		console.log(req.user);
+// 		console.log("oui")
+//         return next();
+//     } else {
+// 		console.log("oui")
+//         res.redirect('/login');
+//     }
+// }
+
+// function confirmIdentity(req, res, next) {
+// 	authenticate();
+
+// 	if (req.params.id) {
+// 		console.log(req.cookies);
+// 		// if (req.params.id === req.cookies)
+// 	} else { //TODO
+// 		res.redirect('/login')
+// 	}
+// 	// check identity
+// }
 
 module.exports = {
 	login: loginUser,
